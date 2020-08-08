@@ -32,10 +32,10 @@ rule %r{^kernel/build/v.*$} => ->(o) { "kernel/config/#{File.basename(o)}" } do 
 
     cp "../config/#{version}", '.config'
 
-    sh <<~EOFSH
+    sh <<~EOSH
       git checkout #{version}
       make -j 8 vmlinux
-    EOFSH
+    EOSH
 
     cp 'vmlinux', "../build/#{version}"
   end
