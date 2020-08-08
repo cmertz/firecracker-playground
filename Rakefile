@@ -2,16 +2,20 @@ require 'tmpdir'
 require 'rake/task'
 
 task :default do
-  STDERR.puts <<~EOI
-    use:
-      rake kernel/build/VERSION
-      rake image/build/NAME
-  EOI
+  system 'rake -T'
 end
 
 desc 'clone linux kernel sources'
 file 'kernel/source' do
   sh 'git clone https://github.com/torvalds/linux.git kernel/source'
+end
+
+# generate descriptions so tasks
+# show up in rake's task listing
+Dir.glob('kernel/config/v*').each do |n|
+  v = File.basename(n)
+  desc "build kernel #{v}"
+  file "kernel/build/#{v}"
 end
 
 rule %r{^kernel/build/v.*$} => ->(o) { "kernel/config/#{File.basename(o)}" } do |task|
@@ -39,6 +43,15 @@ rule %r{^kernel/build/v.*$} => ->(o) { "kernel/config/#{File.basename(o)}" } do 
 
     cp 'vmlinux', "../build/#{version}"
   end
+end
+
+# generate descriptions so tasks
+# show up in rake's task listing
+Dir.glob('image/docker/*').each do |n|
+  v = File.basename(n)
+
+  desc "build docker image #{v}"
+  file "image/build/#{v}"
 end
 
 rule %r{^image/build/.*$} => ->(o) { "image/docker/#{File.basename(o)}" } do |task|
