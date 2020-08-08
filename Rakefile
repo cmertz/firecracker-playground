@@ -1,4 +1,5 @@
 require 'tmpdir'
+require 'rake/task'
 
 task :default do
   STDERR.puts <<~EOI
@@ -18,7 +19,7 @@ rule %r{^kernel/build/v.*$} => ->(o) { "kernel/config/#{File.basename(o)}" } do 
   # invoked explicitly here to have only one dependency
   # on the `rule` in which case it behaves like a `file`
   # task for the task name
-  Task['kernel/source'].invoke
+  Rake::Task['kernel/source'].invoke
 
   version = File.basename(task.name)
 
