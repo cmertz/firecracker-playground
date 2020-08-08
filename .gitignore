@@ -1,3 +1,4 @@
 # add everything necessary excplicitly
+kernel/source/
 kernel/build/
 image/build/
