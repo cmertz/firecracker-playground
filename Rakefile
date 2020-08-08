@@ -1,5 +1,6 @@
 require 'tmpdir'
 require 'rake/task'
+require 'rake/clean'
 
 task :default do
   system 'rake -T'
@@ -10,15 +11,20 @@ file 'kernel/source' do
   sh 'git clone https://github.com/torvalds/linux.git kernel/source'
 end
 
+CLEAN << 'kernel/source'
+
 # generate descriptions so tasks
 # show up in rake's task listing
-Dir.glob('kernel/config/v*').each do |n|
+Dir.glob('kernel/config/*').each do |n|
   v = File.basename(n)
+
   desc "build kernel #{v}"
   file "kernel/build/#{v}"
+
+  CLOBBER << "kernel/build/#{v}"
 end
 
-rule %r{^kernel/build/v.*$} => ->(o) { "kernel/config/#{File.basename(o)}" } do |task|
+rule %r{^kernel/build/.*$} => ->(o) { "kernel/config/#{File.basename(o)}" } do |task|
 
   # invoked explicitly here to have only one dependency
   # on the `rule` in which case it behaves like a `file`
@@ -52,6 +58,8 @@ Dir.glob('image/docker/*').each do |n|
 
   desc "build docker image #{v}"
   file "image/build/#{v}"
+
+  CLOBBER << "image/build/#{v}"
 end
 
 rule %r{^image/build/.*$} => ->(o) { "image/docker/#{File.basename(o)}" } do |task|
